@@ -19,6 +19,7 @@ done = False
 while not done:
     action = env.action_space.sample()
     obs, reward, terminated, truncated, info = env.step(action)
+    print(terminated, truncated)
     done = terminated or truncated
     env.render()  # a display is required to render
 env.close()
