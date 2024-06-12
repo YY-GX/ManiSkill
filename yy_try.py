@@ -2,24 +2,20 @@ import gymnasium as gym
 import mani_skill.envs
 
 env = gym.make(
-    "PickCube-v1", # there are more tasks e.g. "PushCube-v1", "PegInsertionSide-v1", ...
-    num_envs=8,
-    obs_mode="state", # there is also "state_dict", "rgbd", ...
-    control_mode="pd_ee_delta_pose", # there is also "pd_joint_delta_pos", ...
-    render_mode="human"
+    "PickCube-v1",
+    obs_mode="state",
+    control_mode="pd_joint_delta_pos",
+    num_envs=16,
 )
-print("Observation space", env.observation_space)
-print("Action space", env.action_space)
+print(env.observation_space) # will now have shape (16, ...)
+print(env.action_space) # will now have shape (16, ...)
 
 obs, _ = env.reset(seed=0) # reset with a seed for determinism
-print(type(obs))
-print(obs.shape)
-# print(obs.keys())
-done = False
-while not done:
-    action = env.action_space.sample()
+for i in range(200):
+    action = env.action_space.sample() # this is batched now
     obs, reward, terminated, truncated, info = env.step(action)
-    print(terminated, truncated)
-    done = terminated or truncated
-    env.render()  # a display is required to render
+    done = terminated | truncated
+    print(f"Obs shape: {obs.shape}, Reward shape {reward.shape}, Done shape {done.shape}")
+    # note at the moment we do not support showing all parallel sub-scenes
+    # at once on a GUI, only during observation generation/video recording
 env.close()
